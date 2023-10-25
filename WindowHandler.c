@@ -7,60 +7,61 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "WindowHandler.h"
+#include "debugmalloc.h"
 #include "type.h"
-#include <string.h>
 
-Lines CreateBlankPage()
+Lines* CreateBlankPage()
 {
-    Lines lines;
-    Line line;
-    line.size = 0;
-    line.chars = (char*)malloc(100);
-    line.chars[line.size] = '\0';
-    lines.lines = (Line*)malloc(100);
-    lines.lines[0] = line;
-    lines.size = 1;
+    Lines *lines;
+    lines = (Lines *)malloc(sizeof(Lines));
+    lines->size = 0;
+    lines->lines = (Line *)malloc(sizeof(Line));
+    lines->lines[lines->size].size = 0;
+    lines->lines[lines->size].chars = (char *)malloc(sizeof(char));
+    lines->lines[lines->size].chars[lines->lines[lines->size].size] = '\0';
     return lines;
 }
 
-Lines OpenFile(const char* filename)
+Lines* OpenFile(const char* filename)
 {
-    Lines lines;
-    lines.size = 0;
-    lines.lines = (Line*)malloc(100);
-    FILE *file;
-    file = fopen(filename, "r");
+    Lines *lines;
+    FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
-        printf("Nem sikerult megnyitni a file: %s\n", filename);
-        exit(1);
+        printf("Couldn't open file: %s\n", filename);
     }
-    char buffer[1024];
-    char c = fgetc(file);
-    int counter = 0;
-    while (c != EOF)
+    lines = (Lines *)malloc(sizeof(Lines));
+    lines->size = 0;
+    lines->lines = (Line *)malloc(sizeof(Line));
+    lines->lines[lines->size].chars = (char *)malloc(sizeof(char));
+    lines->lines[lines->size].size = 0;
+    char c;
+    while ((c = (char) fgetc(file)) != EOF)
     {
-        while (c != '\n' && c != EOF)
+        if (c == '\n')
         {
-            if (c == '\t') {
-                buffer[counter] = ' ';
-                buffer[++counter] = ' ';
-                buffer[++counter] = ' ';
-                buffer[++counter] = ' ';
-            } else
-            {
-                buffer[counter] = c;
-            }
-            ++counter;
-            c = fgetc(file);
+            lines->lines[lines->size].chars[lines->lines[lines->size].size] = '\0';
+            lines->lines[++lines->size].chars = (char *)malloc(sizeof(char));
+            lines->lines[lines->size].size = 0;
         }
-        buffer[counter] = '\0';
-        lines.lines[lines.size].chars = strdup(buffer);
-        lines.lines[lines.size].size = counter;
-        ++lines.size;
-        counter = 0;
-        c = fgetc(file);
+        else if (c == '\t')
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
+                lines->lines[lines->size].chars[lines->lines[lines->size].size] = ' ';
+                lines->lines[lines->size].size++;
+            }
+        }
+        else
+        {
+            lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
+            lines->lines[lines->size].chars[lines->lines[lines->size].size] = c;
+            lines->lines[lines->size].size += 1;
+        }
     }
+    lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
+    lines->lines[lines->size].chars[lines->lines[lines->size++].size] = '\0';
     fclose(file);
     return lines;
 }
