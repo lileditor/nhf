@@ -3,6 +3,7 @@
 //
 
 #include "cursor.h"
+#include "type.h"
 
 Cursor MoveCursor(Cursor *cursor, Lines *lines, int Direction)
 {

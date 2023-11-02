@@ -22,48 +22,13 @@ Lines* CreateBlankPage()
     return lines;
 }
 
-Lines* OpenFile(const char* filename)
+void FreeMemoryLines(Lines *lines)
 {
-    Lines *lines;
-    FILE *file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        printf("Couldn't open file: %s\n", filename);
+    for (int i = 0; i < lines->size; i++) {
+        free(lines->lines[i].chars);
     }
-    lines = (Lines *)malloc(sizeof(Lines));
-    lines->size = 0;
-    lines->lines = (Line *)malloc(sizeof(Line));
-    lines->lines[lines->size].chars = (char *)malloc(sizeof(char));
-    lines->lines[lines->size].size = 0;
-    char c;
-    while ((c = (char) fgetc(file)) != EOF)
-    {
-        if (c == '\n')
-        {
-            lines->lines[lines->size].chars[lines->lines[lines->size].size] = '\0';
-            lines->lines[++lines->size].chars = (char *)malloc(sizeof(char));
-            lines->lines[lines->size].size = 0;
-        }
-        else if (c == '\t')
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
-                lines->lines[lines->size].chars[lines->lines[lines->size].size] = ' ';
-                lines->lines[lines->size].size++;
-            }
-        }
-        else
-        {
-            lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
-            lines->lines[lines->size].chars[lines->lines[lines->size].size] = c;
-            lines->lines[lines->size].size += 1;
-        }
-    }
-    lines->lines[lines->size].chars = (char *)realloc( lines->lines[lines->size].chars, lines->lines[lines->size].size + 1 * sizeof(char));
-    lines->lines[lines->size].chars[lines->lines[lines->size++].size] = '\0';
-    fclose(file);
-    return lines;
+    free(lines->lines);
+    free(lines);
 }
 
 WindowHandler CreateSDLWindow()

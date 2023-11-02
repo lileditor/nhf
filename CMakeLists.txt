@@ -11,6 +11,8 @@ add_executable(nhf main.c
         cursor.h
         KeyboardHandler.c
         KeyboardHandler.h
+        FileHandler.c
+        FileHandler.h
 )
 INCLUDE(FindPkgConfig)
 

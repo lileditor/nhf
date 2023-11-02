@@ -10,6 +10,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define WINDOW_BPP 18
+#define TAB_SPACE_COUNT 4
 
 typedef struct Line {
     char *chars;

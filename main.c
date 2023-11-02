@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include "WindowHandler.h"
 #include "type.h"
+#include "FileHandler.h"
+#include "debugmalloc.h"
 #include "KeyboardHandler.h"
 
 int quit = 0;
@@ -96,10 +98,11 @@ int main(int argc, char *argv[]) {
 
             SDL_RenderPresent(Window.renderer);
         }
-        free(lines->lines);
-        free(lines);
+        SaveFile(argv[1], lines);
         SDL_FreeSurface(Window.surface);
         SDL_DestroyTexture(Window.texture);
+        FreeMemoryLines(lines);
+        debugmalloc_log_file("memlog.txt");
     }
     else
     {
@@ -192,10 +195,11 @@ int main(int argc, char *argv[]) {
             }
             SDL_RenderPresent(Window.renderer);
         }
-        free(lines->lines);
-        free(lines);
+        //SaveFile(, lines);
         SDL_FreeSurface(Window.surface);
         SDL_DestroyTexture(Window.texture);
+        FreeMemoryLines(lines);
+        debugmalloc_log_file("memlog.txt");
     }
     SDL_Quit();
 

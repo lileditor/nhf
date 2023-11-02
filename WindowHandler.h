@@ -10,5 +10,6 @@
 Lines *CreateBlankPage();
 Lines *OpenFile(const char* filename);
 WindowHandler CreateSDLWindow();
+void FreeMemoryLines(Lines *lines);
 
 #endif //NHF_WINDOWHANDLER_H
