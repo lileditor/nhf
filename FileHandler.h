@@ -6,6 +6,7 @@
 #define NHF_FILEHANDLER_H
 #include "type.h"
 
+char *GenerateFileName(char *filename);
 Lines* OpenFile(const char* filename);
 void SaveFile(const char* filename, Lines *lines);
 
