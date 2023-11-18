@@ -18,6 +18,11 @@ int GetBPP() {
     return BPP;
 }
 
+char swapChar1;
+int swapChar1pos;
+char swapChar2;
+int swapChar2pos;
+
 bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
     if (keyDown[SDL_SCANCODE_LEFT]) {
         MoveCursor(cursor, lines, 1);
@@ -95,10 +100,53 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
         }
         return true;
     } else if (keyDown[SDL_SCANCODE_BACKSPACE]) {
-        //TODO implement backspace
+        if (cursor->x > 0) {
+            cursor->x--;
+            for (int i = cursor->x; i < lines->lines[cursor->line].size; i++) {
+                lines->lines[cursor->line].chars[i] = lines->lines[cursor->line].chars[i + 1];
+            }
+            lines->lines[cursor->line].size--;
+        } else {
+            if (cursor->line > 0) {
+                char* buffer = malloc(lines->lines[cursor->line].size);
+                strncpy(buffer, lines->lines[cursor->line].chars, lines->lines[cursor->line].size);
+                for (int i = cursor->line + 1; i < lines->size - 1; i++) {
+                    lines->lines[i] = lines->lines[i + 1];
+                }
+                lines->size--;
+                lines->lines[cursor->line - 1].size += lines->lines[cursor->line].size;
+                lines->lines[cursor->line - 1].chars = (char *) realloc(lines->lines[cursor->line - 1].chars, lines->lines[cursor->line - 1].size * sizeof (char));
+                strcat(lines->lines[cursor->line - 1].chars, buffer);
+                cursor->x = lines->lines[cursor->line - 1].size - lines->lines[cursor->line].size;
+                cursor->line--;
+                lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
+                free(buffer);
+                buffer = NULL;
+            }
+        }
         return true;
     } else if (keyDown[SDL_SCANCODE_DELETE]) {
-        //TODO implement delete
+        if (cursor->x < lines->lines[cursor->line].size) {
+            for (int i = cursor->x; i < lines->lines[cursor->line].size; i++) {
+                lines->lines[cursor->line].chars[i] = lines->lines[cursor->line].chars[i + 1];
+            }
+            lines->lines[cursor->line].size--;
+        } else {
+            if (cursor->line < lines->size - 1) {
+                char* buffer = malloc(lines->lines[cursor->line + 1].size);
+                strncpy(buffer, lines->lines[cursor->line + 1].chars, lines->lines[cursor->line + 1].size);
+                for (int i = cursor->line + 1; i < lines->size - 1; i++) {
+                    lines->lines[i] = lines->lines[i + 1];
+                }
+                lines->size--;
+                lines->lines[cursor->line].size += lines->lines[cursor->line + 1].size;
+                lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size * sizeof (char));
+                strcat(lines->lines[cursor->line].chars, buffer);
+                lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
+                free(buffer);
+                buffer = NULL;
+            }
+        }
         return true;
     } else if (keyDown[SDL_SCANCODE_TAB]) {
         if (cursor->x == lines->lines[cursor->line].size) {
@@ -123,6 +171,18 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
             free(buffer);
         }
+        return true;
+    } else if(keyDown[SDL_SCANCODE_F1]) {
+        swapChar1 = lines->lines[cursor->line].chars[cursor->x];
+        swapChar1pos = cursor->x;
+        return true;
+    } else if(keyDown[SDL_SCANCODE_F2]) {
+        swapChar2 = lines->lines[cursor->line].chars[cursor->x];
+        swapChar2pos = cursor->x;
+        return true;
+    } else if(keyDown[SDL_SCANCODE_F3]) {
+        lines->lines[cursor->line].chars[swapChar2pos] = swapChar1;
+        lines->lines[cursor->line].chars[swapChar1pos] = swapChar2;
         return true;
     } else if (keyDown[SDL_SCANCODE_LCTRL] && keyDown[SDL_SCANCODE_S] ) {
         SDL_Quit();

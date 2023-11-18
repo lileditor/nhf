@@ -195,7 +195,8 @@ int main(int argc, char *argv[]) {
             }
             SDL_RenderPresent(Window.renderer);
         }
-        //SaveFile(, lines);
+        char *filename;
+        SaveFile(GenerateFileName(filename), lines);
         SDL_FreeSurface(Window.surface);
         SDL_DestroyTexture(Window.texture);
         FreeMemoryLines(lines);

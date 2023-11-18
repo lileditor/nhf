@@ -8,6 +8,27 @@
 #include "debugmalloc.h"
 #include "FileHandler.h"
 
+const char *getRandomChar(char *c)
+{
+    char* chars = "abcdefghijklmnopqrstuvwxyz";
+    int i = rand() % strlen(chars);
+    *c =  chars[i];
+    return c;
+}
+
+char* GenerateFileName(char * filename)
+{
+    int i = 0;
+    while (i < 10)
+    {
+        char *c;
+        strcat(filename, (const char *) getRandomChar(c));
+        i++;
+    }
+    strcat(filename, ".txt");
+    return filename;
+}
+
 Lines* OpenFile(const char* filename)
 {
     Lines *lines;
