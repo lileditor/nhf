@@ -119,6 +119,7 @@ int main(int argc, char *argv[]) {
                 }
                 KeyboardHandler(&event, lines, &Cursor, &Window);
             }
+            printf("Cursor: %d, %d, Line: %d, %d\n", Cursor.x, Cursor.line, lines->size, lines->lines[Cursor.line].size);
             int bpp = GetBPP();
             int y = 0;
             SDL_SetRenderDrawColor(Window.renderer, 0, 0, 0, 0);

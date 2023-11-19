@@ -50,78 +50,59 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
         Window->font = TTF_OpenFont("../SourceCode.ttf", BPP);
         return true;
     } else if (keyDown[SDL_SCANCODE_RETURN] || keyDown[SDL_SCANCODE_KP_ENTER]) {
-        if (lines->lines[cursor->line].size > cursor->x)
-        {
-            char* buffer = malloc((lines->lines[cursor->line].size - cursor->x + 1));
+        if (cursor->x == lines->lines[cursor->line].size){
+            lines->size++;
+            lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
+            cursor->x = 0;
+            cursor->line++;
+            lines->lines[cursor->line].chars = malloc(1);
+            lines->lines[cursor->line].chars[0] = '\0';
+            lines->lines[cursor->line].size = 0;
+        } else {
+            char* buffer = malloc(lines->lines[cursor->line].size - cursor->x + 1);
             strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x + 1);
-            if (cursor->line == lines->size - 1) {
-                lines->lines = (Line *) realloc(lines->lines, (lines->size+1) * sizeof (Line));
-                lines->lines[lines->size].chars = malloc(lines->lines[cursor->line].size - cursor->x + 1);
-                strcpy(lines->lines[lines->size].chars,buffer);
-                free(buffer);
-                buffer = NULL;
-                lines->lines[lines->size].size = lines->lines[cursor->line].size - cursor->x;
-                lines->size++;
-            } else {
-                lines->size++;
-                for (int i = lines->size; i > cursor->line; --i) {
-                    lines->lines[i] = lines->lines[i - 1];
-                }
-                lines->lines[cursor->line + 1].chars = (char *) malloc(lines->lines[cursor->line].size - cursor->x + 1);
-                strcpy(lines->lines[cursor->line + 1].chars,buffer);
-                lines->lines[cursor->line + 1].size = lines->lines[cursor->line].size - cursor->x;
+            lines->size++;
+            lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
+            for (int i = lines->size; i > cursor->line; i--) {
+                lines->lines[i] = lines->lines[i - 1];
             }
-            lines->lines[cursor->line].size = cursor->x;
-            lines->lines[cursor->line].chars[cursor->x] = '\0';
-            cursor->line++;
             cursor->x = 0;
-        } else
-        {
-            if (cursor->line == lines->size - 1) {
-                lines->size++;
-                lines->lines[lines->size].chars = (char *) malloc(sizeof (char));
-                lines->lines[lines->size].chars[0] = '\0';
-                lines->lines[lines->size].size = 0;
-            } else {
-                lines->size++;
-                lines->lines[lines->size].chars = (char *) malloc(cursor->x * sizeof (char));
-                lines->lines[lines->size].size = cursor->x;
-                for (int i = lines->size; i > cursor->line + 1; i--) {
-                    lines->lines[i] = lines->lines[i - 1];
-                }
-                lines->lines[cursor->line + 1].size = 0;
-                lines->lines[cursor->line + 1].chars = (char *) malloc(sizeof (char));
-                lines->lines[cursor->line + 1].chars[0] = '\0';
-            }
-            lines->lines[cursor->line].chars[cursor->x] = '\0';
-            lines->lines[cursor->line].size = cursor->x;
             cursor->line++;
-            cursor->x = 0;
+            lines->lines[cursor->line].chars = malloc(sizeof(buffer));
+            strcat(lines->lines[cursor->line].chars, buffer);
+            lines->lines[cursor->line].size = (int) strlen(buffer);
+            free(buffer);
+            buffer = NULL;
         }
         return true;
     } else if (keyDown[SDL_SCANCODE_BACKSPACE]) {
         if (cursor->x > 0) {
-            cursor->x--;
-            for (int i = cursor->x; i < lines->lines[cursor->line].size; i++) {
+            for (int i = cursor->x - 1; i < lines->lines[cursor->line].size; i++) {
                 lines->lines[cursor->line].chars[i] = lines->lines[cursor->line].chars[i + 1];
             }
+            cursor->x--;
             lines->lines[cursor->line].size--;
         } else {
             if (cursor->line > 0) {
-                char* buffer = malloc(lines->lines[cursor->line].size);
-                strncpy(buffer, lines->lines[cursor->line].chars, lines->lines[cursor->line].size);
-                for (int i = cursor->line + 1; i < lines->size - 1; i++) {
-                    lines->lines[i] = lines->lines[i + 1];
+                if (lines->lines[cursor->line].size > 0) {
+                    char* buffer = malloc(lines->lines[cursor->line].size);
+                    strncpy(buffer, lines->lines[cursor->line].chars, lines->lines[cursor->line].size);
+                    for (int i = cursor->line; i < lines->size; i++){
+                        lines->lines[i] = lines->lines[i + 1];
+                    }
+                    lines->size--;
+                    strcat(lines->lines[cursor->line].chars, buffer);
+                    lines->lines[cursor->line].size += (int) strlen(buffer);
+                    free(buffer);
+                    buffer = NULL;
+                } else {
+                    cursor->x = lines->lines[cursor->line - 1].size;
+                    cursor->line--;
+                    for (int i = cursor->line + 1; i < lines->size; i++) {
+                        lines->lines[i] = lines->lines[i + 1];
+                    }
+                    lines->size--;
                 }
-                lines->size--;
-                lines->lines[cursor->line - 1].size += lines->lines[cursor->line].size;
-                lines->lines[cursor->line - 1].chars = (char *) realloc(lines->lines[cursor->line - 1].chars, lines->lines[cursor->line - 1].size * sizeof (char));
-                strcat(lines->lines[cursor->line - 1].chars, buffer);
-                cursor->x = lines->lines[cursor->line - 1].size - lines->lines[cursor->line].size;
-                cursor->line--;
-                lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
-                free(buffer);
-                buffer = NULL;
             }
         }
         return true;
@@ -133,14 +114,14 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             lines->lines[cursor->line].size--;
         } else {
             if (cursor->line < lines->size - 1) {
-                char* buffer = malloc(lines->lines[cursor->line + 1].size);
+                char *buffer = malloc(lines->lines[cursor->line + 1].size);
                 strncpy(buffer, lines->lines[cursor->line + 1].chars, lines->lines[cursor->line + 1].size);
+                lines->lines[cursor->line].size += lines->lines[cursor->line + 1].size;
                 for (int i = cursor->line + 1; i < lines->size - 1; i++) {
                     lines->lines[i] = lines->lines[i + 1];
                 }
                 lines->size--;
-                lines->lines[cursor->line].size += lines->lines[cursor->line + 1].size;
-                lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size * sizeof (char));
+                lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size * sizeof(char));
                 strcat(lines->lines[cursor->line].chars, buffer);
                 lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
                 free(buffer);
