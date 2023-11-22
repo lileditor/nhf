@@ -1,5 +1,5 @@
 //
-// Created by David on 26/10/2023.
+// Sebe-Norbert-Dávid-FJDH0C-26/10/2023-Szovegszerkezto
 //
 
 #include <stdio.h>
@@ -10,21 +10,23 @@
 
 const char *getRandomChar(char *c)
 {
-    char* chars = "abcdefghijklmnopqrstuvwxyz";
+    char chars[] = "abcdefghijklmnopqrstuvwxyz";
     int i = rand() % strlen(chars);
-    *c =  chars[i];
+    *c = chars[i];
     return c;
 }
 
-char* GenerateFileName(char * filename)
+char* GenerateFileName(char *filename)
 {
     int i = 0;
-    while (i < 10)
+    char c[FILENAME_LENGTH + 1];
+    while (i < FILENAME_LENGTH)
     {
-        char *c;
-        strcat(filename, (const char *) getRandomChar(c));
+        getRandomChar(&c[i]);
         i++;
     }
+    c[i] = '\0';
+    strcat(filename, c);
     strcat(filename, ".txt");
     return filename;
 }

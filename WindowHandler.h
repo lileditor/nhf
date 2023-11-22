@@ -1,5 +1,5 @@
 //
-// Created by David on 2023. 10. 16.
+// Sebe-Norbert-Dávid-FJDH0C-16/10/2023-Szovegszerkezto
 //
 
 #ifndef NHF_WINDOWHANDLER_H

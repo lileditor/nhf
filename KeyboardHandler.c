@@ -1,5 +1,5 @@
 //
-// Created by David on 21/10/2023.
+// Sebe-Norbert-Dávid-FJDH0C-21/10/2023-Szovegszerkezto
 //
 
 #include "KeyboardHandler.h"
@@ -22,6 +22,13 @@ char swapChar1;
 int swapChar1pos;
 char swapChar2;
 int swapChar2pos;
+
+bool isFuntionKey() {
+    if (keyDown[SDL_SCANCODE_UNDO] || keyDown[SDL_SCANCODE_LCTRL] || keyDown[SDL_SCANCODE_RCTRL] || keyDown[SDL_SCANCODE_END] || keyDown[SDL_SCANCODE_HOME] || keyDown[SDL_SCANCODE_PAGEDOWN] || keyDown[SDL_SCANCODE_PAGEUP] || keyDown[SDL_SCANCODE_LSHIFT] || keyDown[SDL_SCANCODE_RSHIFT] || keyDown[SDL_SCANCODE_LALT] || keyDown[SDL_SCANCODE_RALT] || keyDown[SDL_SCANCODE_LGUI] || keyDown[SDL_SCANCODE_RGUI] || keyDown[SDL_SCANCODE_PRINTSCREEN] || keyDown[SDL_SCANCODE_PAUSE] || keyDown[SDL_SCANCODE_F4] || keyDown[SDL_SCANCODE_F5] || keyDown[SDL_SCANCODE_F6] || keyDown[SDL_SCANCODE_F7] || keyDown[SDL_SCANCODE_F8] || keyDown[SDL_SCANCODE_F9] || keyDown[SDL_SCANCODE_F10] || keyDown[SDL_SCANCODE_F11] || keyDown[SDL_SCANCODE_F12]) {
+        return true;
+    }
+    return false;
+}
 
 bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
     if (keyDown[SDL_SCANCODE_LEFT]) {
@@ -49,50 +56,64 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
         UpdateBPP(-2);
         Window->font = TTF_OpenFont("../SourceCode.ttf", BPP);
         return true;
-    } else if (keyDown[SDL_SCANCODE_RETURN] || keyDown[SDL_SCANCODE_KP_ENTER]) {
+    }
+    else if (keyDown[SDL_SCANCODE_RETURN] || keyDown[SDL_SCANCODE_KP_ENTER]) {
         if (cursor->x == lines->lines[cursor->line].size){
             lines->size++;
-            lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
-            cursor->x = 0;
-            cursor->line++;
-            lines->lines[cursor->line].chars = malloc(1);
-            lines->lines[cursor->line].chars[0] = '\0';
-            lines->lines[cursor->line].size = 0;
-        } else {
-            char* buffer = malloc(lines->lines[cursor->line].size - cursor->x + 1);
-            strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x + 1);
-            lines->size++;
-            lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
+            lines->lines = realloc(lines->lines, (lines->size + 1) * sizeof(Line));
             for (int i = lines->size; i > cursor->line; i--) {
                 lines->lines[i] = lines->lines[i - 1];
             }
             cursor->x = 0;
             cursor->line++;
-            lines->lines[cursor->line].chars = malloc(sizeof(buffer));
-            strcat(lines->lines[cursor->line].chars, buffer);
-            lines->lines[cursor->line].size = (int) strlen(buffer);
+            lines->lines[cursor->line].chars = malloc(sizeof(char));
+            lines->lines[cursor->line].chars[0] = '\0';
+            lines->lines[cursor->line].size = 0;
+        } else
+        {
+            int stringSize = lines->lines[cursor->line].size - cursor->x + 1;
+            char* buffer = malloc(stringSize);
+            strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, stringSize);
+            lines->size++;
+            lines->lines = realloc(lines->lines, (lines->size + 1) * sizeof(Line));
+            lines->lines[cursor->line].chars[cursor->x] = '\0';
+            lines->lines[cursor->line].size = cursor->x;
+            for (int i = lines->size; i > cursor->line; i--) {
+                lines->lines[i] = lines->lines[i - 1];
+            }
+            cursor->x = 0;
+            cursor->line++;
+            lines->lines[cursor->line].chars = (char *) malloc(stringSize + 1);
+            strncpy(lines->lines[cursor->line].chars, buffer, stringSize);
+            lines->lines[cursor->line].size = stringSize;
             free(buffer);
             buffer = NULL;
         }
         return true;
-    } else if (keyDown[SDL_SCANCODE_BACKSPACE]) {
+    }
+    else if (keyDown[SDL_SCANCODE_BACKSPACE]) {
         if (cursor->x > 0) {
             for (int i = cursor->x - 1; i < lines->lines[cursor->line].size; i++) {
                 lines->lines[cursor->line].chars[i] = lines->lines[cursor->line].chars[i + 1];
             }
             cursor->x--;
             lines->lines[cursor->line].size--;
-        } else {
+        } else
+        {
             if (cursor->line > 0) {
                 if (lines->lines[cursor->line].size > 0) {
-                    char* buffer = malloc(lines->lines[cursor->line].size);
+                    char *buffer = malloc(lines->lines[cursor->line].size);
                     strncpy(buffer, lines->lines[cursor->line].chars, lines->lines[cursor->line].size);
-                    for (int i = cursor->line; i < lines->size; i++){
+                    strcat(lines->lines[cursor->line - 1].chars, buffer);
+                    cursor->x = lines->lines[cursor->line - 1].size;
+                    lines->lines[cursor->line - 1].size += lines->lines[cursor->line].size;
+                    for (int i = cursor->line; i < lines->size - 1; i++) {
                         lines->lines[i] = lines->lines[i + 1];
                     }
+                    lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
+                    cursor->line--;
+                    lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
                     lines->size--;
-                    strcat(lines->lines[cursor->line].chars, buffer);
-                    lines->lines[cursor->line].size += (int) strlen(buffer);
                     free(buffer);
                     buffer = NULL;
                 } else {
@@ -106,7 +127,8 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             }
         }
         return true;
-    } else if (keyDown[SDL_SCANCODE_DELETE]) {
+    }
+    else if (keyDown[SDL_SCANCODE_DELETE]) {
         if (cursor->x < lines->lines[cursor->line].size) {
             for (int i = cursor->x; i < lines->lines[cursor->line].size; i++) {
                 lines->lines[cursor->line].chars[i] = lines->lines[cursor->line].chars[i + 1];
@@ -129,7 +151,8 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             }
         }
         return true;
-    } else if (keyDown[SDL_SCANCODE_TAB]) {
+    }
+    else if (keyDown[SDL_SCANCODE_TAB]) {
         if (cursor->x == lines->lines[cursor->line].size) {
             lines->lines[cursor->line].chars = realloc(lines->lines[cursor->line].chars,
                                                        lines->lines[cursor->line].size + TAB_SPACE_COUNT);
@@ -138,9 +161,7 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             }
             lines->lines[cursor->line].chars[cursor->x] = '\0';
             lines->lines[cursor->line].size += TAB_SPACE_COUNT;
-        }
-        else
-        {
+        } else {
             char* buffer = malloc((lines->lines[cursor->line].size - cursor->x + 1));
             strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x + 1);
             for (size_t i = 0; i < TAB_SPACE_COUNT; i++) {
@@ -153,19 +174,23 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             free(buffer);
         }
         return true;
-    } else if(keyDown[SDL_SCANCODE_F1]) {
+    }
+    else if(keyDown[SDL_SCANCODE_F1]) {
         swapChar1 = lines->lines[cursor->line].chars[cursor->x];
         swapChar1pos = cursor->x;
         return true;
-    } else if(keyDown[SDL_SCANCODE_F2]) {
+    }
+    else if(keyDown[SDL_SCANCODE_F2]) {
         swapChar2 = lines->lines[cursor->line].chars[cursor->x];
         swapChar2pos = cursor->x;
         return true;
-    } else if(keyDown[SDL_SCANCODE_F3]) {
+    }
+    else if(keyDown[SDL_SCANCODE_F3]) {
         lines->lines[cursor->line].chars[swapChar2pos] = swapChar1;
         lines->lines[cursor->line].chars[swapChar1pos] = swapChar2;
         return true;
-    } else if (keyDown[SDL_SCANCODE_LCTRL] && keyDown[SDL_SCANCODE_S] ) {
+    }
+    else if (keyDown[SDL_SCANCODE_LCTRL] && keyDown[SDL_SCANCODE_S] ) {
         SDL_Quit();
         return true;
     }
@@ -189,15 +214,19 @@ void handleInputText(Lines *lines, Cursor *cursor, SDL_Keycode keycode) {
             cursor->x++;
         }
     } else {
-        if (lines->lines[cursor->line].size > cursor->x) {
-            char *buffer = malloc((lines->lines[cursor->line].size - cursor->x + 1) * sizeof(char));
-            memcpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x);
-            lines->lines[cursor->line].size++;
-            lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size * sizeof(char) + 1);
+        if (lines->lines[cursor->line].size > cursor->x)
+        {
+            char* buffer = malloc(lines->lines[cursor->line].size - cursor->x + 1);
+            strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x + 1);
+            lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars,(lines->lines[cursor->line].size + 2) * sizeof(char));
             lines->lines[cursor->line].chars[cursor->x] = (char) keycode;
-            lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
-            lines->lines[cursor->line].chars[++cursor->x] = *buffer;
-        } else {
+            lines->lines[cursor->line].chars[++cursor->x] = '\0';
+            strcat(lines->lines[cursor->line].chars, buffer);
+            lines->lines[cursor->line].chars[++lines->lines[cursor->line].size] = '\0';
+            free(buffer);
+            buffer = NULL;
+        } else
+        {
             lines->lines[cursor->line].size++;
             lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, (lines->lines[cursor->line].size + 1) * sizeof(char));
             lines->lines[cursor->line].chars[cursor->x] = (char) keycode;
@@ -205,7 +234,6 @@ void handleInputText(Lines *lines, Cursor *cursor, SDL_Keycode keycode) {
             cursor->x++;
         }
     }
-
 }
 
 void KeyboardHandler(SDL_Event *event, Lines *lines, Cursor *cursor, WindowHandler *Window)
@@ -215,7 +243,7 @@ void KeyboardHandler(SDL_Event *event, Lines *lines, Cursor *cursor, WindowHandl
             if (event->key.keysym.scancode != SDL_SCANCODE_INSERT)
             {
                 keyDown[event->key.keysym.scancode] = 1;
-                if (!isAnyFunction(cursor, lines, Window))
+                if (!isAnyFunction(cursor, lines, Window) && !isFuntionKey())
                     handleInputText(lines, cursor, event->key.keysym.sym);
             } else {
                 keyDown[SDL_SCANCODE_INSERT] = !keyDown[SDL_SCANCODE_INSERT];

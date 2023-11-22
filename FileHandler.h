@@ -1,5 +1,5 @@
 //
-// Created by David on 26/10/2023.
+// Sebe-Norbert-Dávid-FJDH0C-26/10/2023-Szovegszerkezto
 //
 
 #ifndef NHF_FILEHANDLER_H
