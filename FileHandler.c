@@ -7,6 +7,7 @@
 #include "type.h"
 #include "debugmalloc.h"
 #include "FileHandler.h"
+#include "WindowHandler.h"
 
 const char *getRandomChar(char *c)
 {
@@ -37,7 +38,7 @@ Lines* OpenFile(const char* filename)
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
-        printf("Couldn't open file: %s\n", filename);
+        lines = CreateBlankPage();
     }
     lines = (Lines *)malloc(sizeof(Lines));
     lines->size = 0;

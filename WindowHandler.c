@@ -19,12 +19,13 @@ Lines* CreateBlankPage()
     lines->lines[lines->size].size = 0;
     lines->lines[lines->size].chars = (char *)malloc(sizeof(char));
     lines->lines[lines->size].chars[lines->lines[lines->size].size] = '\0';
+    lines->size++;
     return lines;
 }
 
 void FreeMemoryLines(Lines *lines)
 {
-    for (int i = 0; i <= lines->size; i++) {
+    for (int i = 0; i < lines->size; i++) {
         free(lines->lines[i].chars);
     }
     free(lines->lines);

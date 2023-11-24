@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
             SDL_SetRenderDrawColor(Window.renderer, 0, 0, 0, 0);
             SDL_RenderClear(Window.renderer);
             int y = 0;
-            for (int i = 0; i <= lines->size; i++) {
+            for (int i = 0; i < lines->size; i++) {
                 char* line = lines->lines[i].chars;
                 if (*line != '\0') {
                     SDL_Surface *lineSurface = TTF_RenderText_Solid(Window.font, line, fg);
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
             int y = 0;
             SDL_SetRenderDrawColor(Window.renderer, 0, 0, 0, 0);
             SDL_RenderClear(Window.renderer);
-            for (int i = 0; i <= lines->size; i++) {
+            for (int i = 0; i < lines->size; i++) {
                 char* line = lines->lines[i].chars;
                 if (*line != '\0') {
                     SDL_Surface *lineSurface = TTF_RenderText_Solid(Window.font, line, fg);

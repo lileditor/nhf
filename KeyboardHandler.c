@@ -61,12 +61,12 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
         if (cursor->x == lines->lines[cursor->line].size){
             lines->size++;
             lines->lines = realloc(lines->lines, (lines->size + 1) * sizeof(Line));
-            for (int i = lines->size; i > cursor->line; i--) {
+            for (int i = lines->size - 1; i > cursor->line; i--) {
                 lines->lines[i] = lines->lines[i - 1];
             }
             cursor->x = 0;
             cursor->line++;
-            lines->lines[cursor->line].chars = malloc(sizeof(char));
+            lines->lines[cursor->line].chars = (char *) malloc(1);
             lines->lines[cursor->line].chars[0] = '\0';
             lines->lines[cursor->line].size = 0;
         } else
@@ -136,18 +136,28 @@ bool isAnyFunction(Cursor *cursor, Lines *lines, WindowHandler *Window) {
             lines->lines[cursor->line].size--;
         } else {
             if (cursor->line < lines->size - 1) {
-                char *buffer = malloc(lines->lines[cursor->line + 1].size);
-                strncpy(buffer, lines->lines[cursor->line + 1].chars, lines->lines[cursor->line + 1].size);
-                lines->lines[cursor->line].size += lines->lines[cursor->line + 1].size;
-                for (int i = cursor->line + 1; i < lines->size - 1; i++) {
-                    lines->lines[i] = lines->lines[i + 1];
+                if (lines->lines[cursor->line + 1].size > 0) {
+                    char *buffer = malloc(lines->lines[cursor->line + 1].size + 1);
+                    strncpy(buffer, lines->lines[cursor->line + 1].chars, lines->lines[cursor->line + 1].size + 1);
+                    lines->lines[cursor->line].size += lines->lines[cursor->line + 1].size;
+                    for (int i = cursor->line + 1; i < lines->size - 1; i++) {
+                        lines->lines[i] = lines->lines[i + 1];
+                    }
+                    lines->size--;
+                    lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, (lines->lines[cursor->line].size + 1) * sizeof(char));
+                    strcat(lines->lines[cursor->line].chars, buffer);
+                    lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
+                    free(buffer);
+                    buffer = NULL;
+                } else {
+                    for (int i = cursor->line + 1; i < lines->size - 1; i++) {
+                        lines->lines[i] = lines->lines[i + 1];
+                    }
+                    lines->lines = realloc(lines->lines, lines->size * sizeof(Line));
+                    lines->lines[cursor->line].chars = realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size + 1);
+                    lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
+                    lines->size--;
                 }
-                lines->size--;
-                lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, lines->lines[cursor->line].size * sizeof(char));
-                strcat(lines->lines[cursor->line].chars, buffer);
-                lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
-                free(buffer);
-                buffer = NULL;
             }
         }
         return true;
@@ -218,7 +228,7 @@ void handleInputText(Lines *lines, Cursor *cursor, SDL_Keycode keycode) {
         {
             char* buffer = malloc(lines->lines[cursor->line].size - cursor->x + 1);
             strncpy(buffer, lines->lines[cursor->line].chars + cursor->x, lines->lines[cursor->line].size - cursor->x + 1);
-            lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars,(lines->lines[cursor->line].size + 2) * sizeof(char));
+            lines->lines[cursor->line].chars = realloc(lines->lines[cursor->line].chars,(lines->lines[cursor->line].size + 2) * sizeof(char));
             lines->lines[cursor->line].chars[cursor->x] = (char) keycode;
             lines->lines[cursor->line].chars[++cursor->x] = '\0';
             strcat(lines->lines[cursor->line].chars, buffer);
@@ -228,7 +238,7 @@ void handleInputText(Lines *lines, Cursor *cursor, SDL_Keycode keycode) {
         } else
         {
             lines->lines[cursor->line].size++;
-            lines->lines[cursor->line].chars = (char *) realloc(lines->lines[cursor->line].chars, (lines->lines[cursor->line].size + 1) * sizeof(char));
+            lines->lines[cursor->line].chars = realloc(lines->lines[cursor->line].chars, (lines->lines[cursor->line].size + 1) * sizeof(char));
             lines->lines[cursor->line].chars[cursor->x] = (char) keycode;
             lines->lines[cursor->line].chars[lines->lines[cursor->line].size] = '\0';
             cursor->x++;
