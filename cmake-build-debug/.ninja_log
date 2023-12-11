@@ -1,8 +1,0 @@
-# ninja log v5
-20	2261	7203793320000000	CMakeFiles/nhf.dir/main.c.obj	55df174ef0452c7a
-1141	1573	7203804700000000	nhf.exe	5f88d49abc0c4861
-3	666	7203980520000000	build.ninja	eead49d346b4918b
-31	2240	7203793320000000	CMakeFiles/nhf.dir/cursor.c.obj	626a48279b30bc22
-8	2282	7203793320000000	CMakeFiles/nhf.dir/WindowHandler.c.obj	69b9daee7ea08767
-8	1139	7203804700000000	CMakeFiles/nhf.dir/KeyboardHandler.c.obj	a1218ca6ce060d0a
-7	1170	7203796700000000	CMakeFiles/nhf.dir/FileHandler.c.obj	b3e8a26599a800a
