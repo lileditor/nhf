@@ -1,5 +1,5 @@
 //
-// Created by David on 26/10/2023.
+// Sebe-Norbert-Dávid-FJDH0C-26/10/2023-Szovegszerkezto
 //
 
 #include <stdio.h>
@@ -7,6 +7,30 @@
 #include "type.h"
 #include "debugmalloc.h"
 #include "FileHandler.h"
+#include "WindowHandler.h"
+
+const char *getRandomChar(char *c)
+{
+    char chars[] = "abcdefghijklmnopqrstuvwxyz";
+    int i = rand() % strlen(chars);
+    *c = chars[i];
+    return c;
+}
+
+char* GenerateFileName(char *filename)
+{
+    int i = 0;
+    char c[FILENAME_LENGTH + 1];
+    while (i < FILENAME_LENGTH)
+    {
+        getRandomChar(&c[i]);
+        i++;
+    }
+    c[i] = '\0';
+    strcat(filename, c);
+    strcat(filename, ".txt");
+    return filename;
+}
 
 const char *getRandomChar(char *c)
 {
@@ -35,7 +59,7 @@ Lines* OpenFile(const char* filename)
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
-        printf("Couldn't open file: %s\n", filename);
+        lines = CreateBlankPage();
     }
     lines = (Lines *)malloc(sizeof(Lines));
     lines->size = 0;

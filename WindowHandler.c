@@ -1,5 +1,5 @@
 //
-// Created by David on 2023. 10. 16
+// Sebe-Norbert-Dávid-FJDH0C-16/10/2023-Szovegszerkezto
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +19,7 @@ Lines* CreateBlankPage()
     lines->lines[lines->size].size = 0;
     lines->lines[lines->size].chars = (char *)malloc(sizeof(char));
     lines->lines[lines->size].chars[lines->lines[lines->size].size] = '\0';
+    lines->size++;
     return lines;
 }
 
@@ -53,14 +54,14 @@ WindowHandler CreateSDLWindow()
 
     if (TTF_Init() < 0)
     {
-        printf("Couldn't initialize SDL TTF: %s\n", SDL_GetError());
+        printf("Nem hozhato letre a TTF: %s\n", SDL_GetError());
         exit(1);
     }
 
     Window.font = TTF_OpenFont("../SourceCode.ttf", WINDOW_BPP);
     if (Window.font == NULL)
     {
-        printf("Couldn't load font: %s\n", TTF_GetError());
+        printf("Nem lehet betolteni a betutipust: %s\n", TTF_GetError());
         exit(1);
     }
 
@@ -68,13 +69,13 @@ WindowHandler CreateSDLWindow()
     Window.surface = TTF_RenderText_Solid(Window.font, "na csa!", fg);
     if (Window.surface == NULL)
     {
-        printf("Couldn't render text: %s\n", TTF_GetError());
+        printf("Nem lehet megjeliteni a szoveget: %s\n", TTF_GetError());
         exit(1);
     }
     Window.texture = SDL_CreateTextureFromSurface(Window.renderer, Window.surface);
     if (Window.texture == NULL)
     {
-        printf("Couldn't create texture: %s\n", SDL_GetError());
+        printf("Nem lehet megjelenteni a texurat: %s\n", SDL_GetError());
         exit(1);
     }
     return Window;

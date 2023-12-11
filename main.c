@@ -1,3 +1,7 @@
+//
+// Sebe-Norbert-D�vid-FJDH0C-18/10/2023-Szovegszerkezto
+//
+
 #include <SDL.h>
 #include "WindowHandler.h"
 #include "type.h"
@@ -47,20 +51,14 @@ int main(int argc, char *argv[]) {
                     SDL_FreeSurface(lineSurface);
                     SDL_DestroyTexture(lineTexture);
                     if (i == Cursor.line) {
-                        // Calculate the position of the cursor within the line
                         int cursorX = bpp % 10 >= 5 ? Cursor.x * ((bpp /2) + bpp/10 + 1) : Cursor.x * ((bpp /2) + bpp/10);
                         int cursorY = y;
-
-                        // Set the color of the cursor
                         SDL_SetRenderDrawColor(Window.renderer, 255, 0, 0, 255);
-                        // Create a rectangle for the cursor
                         SDL_Rect cursorRect;
                         cursorRect.x = cursorX;
                         cursorRect.y = cursorY + 2;
-                        cursorRect.w = 2; // Width of the cursor
-                        cursorRect.h = bpp; // Height of the cursor
-
-                        // Render the cursor
+                        cursorRect.w = 2;
+                        cursorRect.h = bpp;
                         SDL_RenderFillRect(Window.renderer, &cursorRect);
                     }
                     y += lineSurface->h;
@@ -79,17 +77,12 @@ int main(int argc, char *argv[]) {
                     if (i == Cursor.line) {
                         int cursorX = bpp % 10 >= 5 ? Cursor.x * ((bpp /2) + bpp/10 + 1) : Cursor.x * ((bpp /2) + bpp/10);
                         int cursorY = y;
-
                         SDL_SetRenderDrawColor(Window.renderer, 255, 0, 0, 255);
-
-                        // Create a rectangle for the cursor
                         SDL_Rect cursorRect;
                         cursorRect.x = cursorX;
                         cursorRect.y = cursorY;
-                        cursorRect.w = 2; // Width of the cursor
-                        cursorRect.h = bpp; // Height of the cursor
-
-                        // Render the cursor
+                        cursorRect.w = 2;
+                        cursorRect.h = bpp;
                         SDL_RenderFillRect(Window.renderer, &cursorRect);
                     }
                     y += Window.surface->h;
@@ -106,8 +99,7 @@ int main(int argc, char *argv[]) {
     }
     else
     {
-        Lines *lines = OpenFile("test.txt");
-        //Lines *lines = CreateBlankPage();
+        Lines *lines = CreateBlankPage();
         Cursor Cursor = {0, 0};
         SDL_Color fg = {255, 255, 255};
 
@@ -145,20 +137,14 @@ int main(int argc, char *argv[]) {
                     SDL_FreeSurface(lineSurface);
                     SDL_DestroyTexture(lineTexture);
                     if (i == Cursor.line) {
-                        // Calculate the position of the cursor within the line
                         int cursorX = bpp % 10 >= 5 ? Cursor.x * ((bpp /2) + bpp/10 + 1) : Cursor.x * ((bpp /2) + bpp/10);
                         int cursorY = y;
-
-                        // Set the color of the cursor
                         SDL_SetRenderDrawColor(Window.renderer, 255, 0, 0, 255);
-                        // Create a rectangle for the cursor
                         SDL_Rect cursorRect;
                         cursorRect.x = cursorX;
                         cursorRect.y = cursorY + 2;
-                        cursorRect.w = 2; // Width of the cursor
-                        cursorRect.h = bpp; // Height of the cursor
-
-                        // Render the cursor
+                        cursorRect.w = 2;
+                        cursorRect.h = bpp;
                         SDL_RenderFillRect(Window.renderer, &cursorRect);
                     }
                     y += lineSurface->h;
@@ -177,17 +163,12 @@ int main(int argc, char *argv[]) {
                     if (i == Cursor.line) {
                         int cursorX = bpp % 10 >= 5 ? Cursor.x * ((bpp /2) + bpp/10 + 1) : Cursor.x * ((bpp /2) + bpp/10);
                         int cursorY = y;
-
                         SDL_SetRenderDrawColor(Window.renderer, 255, 0, 0, 255);
-
-                        // Create a rectangle for the cursor
                         SDL_Rect cursorRect;
                         cursorRect.x = cursorX;
                         cursorRect.y = cursorY;
-                        cursorRect.w = 2; // Width of the cursor
-                        cursorRect.h = bpp; // Height of the cursor
-
-                        // Render the cursor
+                        cursorRect.w = 2;
+                        cursorRect.h = bpp;
                         SDL_RenderFillRect(Window.renderer, &cursorRect);
                     }
                     y += Window.surface->h;
@@ -195,7 +176,7 @@ int main(int argc, char *argv[]) {
             }
             SDL_RenderPresent(Window.renderer);
         }
-        char *filename;
+        char filename[FILENAME_LENGTH + 1] = "";
         SaveFile(GenerateFileName(filename), lines);
         SDL_FreeSurface(Window.surface);
         SDL_DestroyTexture(Window.texture);

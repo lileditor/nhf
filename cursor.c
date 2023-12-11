@@ -1,5 +1,5 @@
 //
-// Created by David on 18/10/2023.
+// Sebe-Norbert-Dávid-FJDH0C-18/10/2023-Szovegszerkezto
 //
 
 #include "cursor.h"

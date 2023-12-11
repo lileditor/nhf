@@ -1,5 +1,5 @@
 //
-// Created by David on 2023. 10. 16.
+// Sebe-Norbert-Dávid-FJDH0C-16/10/2023-Szovegszerkezto
 //
 
 #ifndef NHF_TYPE_H
@@ -11,6 +11,7 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_BPP 18
 #define TAB_SPACE_COUNT 4
+#define FILENAME_LENGTH 10
 
 typedef struct Line {
     char *chars;
